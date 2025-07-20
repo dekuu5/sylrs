@@ -1,6 +1,7 @@
-use std::string;
 
-use clap::{builder::Str, Parser, Subcommand};
+use clap::{ Parser, Subcommand};
+
+use crate::status::Status;
 
 
 #[derive(Parser)]
@@ -15,15 +16,21 @@ enum Commands {
     Login {token : Option<String>} 
 }
 
-pub fn run_cli() {
+pub fn run_cli(s : &mut Status) {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Status => get_status(),
+        Commands::Status =>{
+            println!("{:?}",s)
+        },
         Commands::Login { token } => {
             let token = token.clone();
             match login(token) {
-                Ok(x) => println!("{}",x),
+                Ok(x) => {
+                    println!("{}",x);
+                    s.update_token(x);
+            
+                },
                 Err(e) => eprintln!("Error : {}",e),
             }
         }
@@ -31,9 +38,6 @@ pub fn run_cli() {
 }
 
 
-fn get_status() {
-    todo!()
-}
 
 fn login(token: Option<String>) -> Result<String, String> {
     match token {
